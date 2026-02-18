@@ -1,0 +1,12 @@
+### IntelliJ IDEA ###
+*.iml
+.idea/
+out/
+target/
+
+### Java ###
+*.class
+*.log
+*.tmp
+
+.env
