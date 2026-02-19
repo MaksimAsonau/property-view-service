@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-empty
+      author: maksim asonau
+      changes: []
