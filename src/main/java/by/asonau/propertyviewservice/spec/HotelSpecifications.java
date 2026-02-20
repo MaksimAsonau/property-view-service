@@ -2,20 +2,23 @@ package by.asonau.propertyviewservice.spec;
 
 import by.asonau.propertyviewservice.model.entity.Amenity;
 import by.asonau.propertyviewservice.model.entity.Hotel;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 
 public final class HotelSpecifications {
 
-    public static final String FIELD_NAME = "name";
-    public static final String FIELD_BRAND = "brand";
-    public static final String FIELD_ADDRESS = "address";
-    public static final String FIELD_CITY = "city";
-    public static final String FIELD_COUNTRY = "country";
-    public static final String FIELD_AMENITIES = "amenities";
+    private static final String FIELD_ID = "id";
+    private static final String FIELD_NAME = "name";
+    private static final String FIELD_BRAND = "brand";
+    private static final String FIELD_ADDRESS = "address";
+    private static final String FIELD_CITY = "city";
+    private static final String FIELD_COUNTRY = "country";
+    private static final String FIELD_AMENITIES = "amenities";
 
     private HotelSpecifications() {
     }
@@ -62,28 +65,36 @@ public final class HotelSpecifications {
         };
     }
 
-    public static Specification<Hotel> hasAmenities(List<String> amenities) {
+    public static Specification<Hotel> hasAmenitiesAll(List<String> amenities) {
         return (root, query, criteriaBuilder) -> {
-            if (amenities == null || amenities.isEmpty()) {
-                return criteriaBuilder.conjunction();
-            }
-
-            List<String> normalized = amenities.stream()
-                    .filter(a -> a != null && !a.trim().isBlank())
-                    .map(a -> a.trim().toLowerCase())
-                    .distinct()
-                    .toList();
-
+            List<String> normalized = normalizeAmenities(amenities);
             if (normalized.isEmpty()) {
                 return criteriaBuilder.conjunction();
             }
 
+            Join<Hotel, Amenity> amenityJoin = root.join(FIELD_AMENITIES, JoinType.INNER);
+
+            Expression<String> amenityNameLower = criteriaBuilder.lower(amenityJoin.get(FIELD_NAME));
+            Predicate inPredicate = amenityNameLower.in(normalized);
+
             if (query != null) {
                 query.distinct(true);
+                query.groupBy(root.get(FIELD_ID));
+                query.having(criteriaBuilder.equal(criteriaBuilder.countDistinct(amenityNameLower), normalized.size()));
             }
 
-            Join<Hotel, Amenity> join = root.join(FIELD_AMENITIES, JoinType.LEFT);
-            return join.get(FIELD_NAME).in(normalized);
+            return inPredicate;
         };
+    }
+
+    private static List<String> normalizeAmenities(List<String> amenities) {
+        if (amenities == null) {
+            return List.of();
+        }
+        return amenities.stream()
+                .filter(a -> a != null && !a.trim().isBlank())
+                .map(a -> a.trim().toLowerCase())
+                .distinct()
+                .toList();
     }
 }

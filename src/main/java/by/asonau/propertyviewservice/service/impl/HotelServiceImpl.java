@@ -84,12 +84,18 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
-    public List<HotelShortResponse> search(String name, String brand, String city, String country, List<String> amenities) {
+    public List<HotelShortResponse> search(
+            String name,
+            String brand,
+            String city,
+            String country,
+            List<String> amenities) {
+
         Specification<Hotel> spec = HotelSpecifications.nameLike(name)
                 .and(HotelSpecifications.brandEquals(brand))
                 .and(HotelSpecifications.cityEquals(city))
                 .and(HotelSpecifications.countryEquals(country))
-                .and(HotelSpecifications.hasAmenities(amenities));
+                .and(HotelSpecifications.hasAmenitiesAll(amenities));
 
         return hotelRepository.findAll(spec)
                 .stream()
