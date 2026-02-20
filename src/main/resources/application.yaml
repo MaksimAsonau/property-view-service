@@ -2,6 +2,12 @@ spring:
   application:
     name: property-view-service
 
+  jpa:
+    open-in-view: false
+
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+
 server:
   port: 8092
   servlet:
