@@ -12,6 +12,7 @@ import by.asonau.propertyviewservice.repository.HotelRepository;
 import by.asonau.propertyviewservice.service.HotelService;
 import by.asonau.propertyviewservice.spec.HotelSpecifications;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,16 +67,12 @@ public class HotelServiceImpl implements HotelService {
             if (raw == null) {
                 continue;
             }
-            String name = raw.trim();
+            String name = normalizeAmenityName(raw);
             if (name.isBlank()) {
                 continue;
             }
 
-            Amenity amenity = amenityRepository.findByNameIgnoreCase(name)
-                    .orElseGet(() -> amenityRepository.save(
-                            Amenity.builder().name(name).build()
-                    ));
-
+            Amenity amenity = getOrCreateAmenity(name);
             hotel.getAmenities().add(amenity);
         }
 
@@ -101,5 +98,20 @@ public class HotelServiceImpl implements HotelService {
                 .stream()
                 .map(hotelMapper::toShortDto)
                 .toList();
+    }
+
+    private Amenity getOrCreateAmenity(String name) {
+        return amenityRepository.findByNameIgnoreCase(name).orElseGet(() -> {
+            try {
+                return amenityRepository.save(Amenity.builder().name(name).build());
+            } catch (DataIntegrityViolationException e) {
+                return amenityRepository.findByNameIgnoreCase(name)
+                        .orElseThrow(() -> e);
+            }
+        });
+    }
+
+    private String normalizeAmenityName(String raw) {
+        return raw.trim().replaceAll("\\s+", " ");
     }
 }

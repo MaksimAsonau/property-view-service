@@ -1,7 +1,6 @@
 package by.asonau.propertyviewservice.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +15,6 @@ import java.time.LocalTime;
 public class ArrivalTimeResponse {
 
     @JsonFormat(pattern = "HH:mm")
-    @NotNull
     private LocalTime checkIn;
 
     @JsonFormat(pattern = "HH:mm")
