@@ -10,7 +10,7 @@ import by.asonau.propertyviewservice.model.entity.Hotel;
 import by.asonau.propertyviewservice.repository.AmenityRepository;
 import by.asonau.propertyviewservice.repository.HotelRepository;
 import by.asonau.propertyviewservice.service.HotelService;
-import by.asonau.propertyviewservice.spec.HotelSpecifications;
+import by.asonau.propertyviewservice.repository.specification.HotelSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.domain.Specification;

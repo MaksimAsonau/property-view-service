@@ -1,4 +1,4 @@
-package by.asonau.propertyviewservice.spec;
+package by.asonau.propertyviewservice.repository.specification;
 
 import by.asonau.propertyviewservice.model.entity.Amenity;
 import by.asonau.propertyviewservice.model.entity.Hotel;
